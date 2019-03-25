@@ -1,0 +1,16 @@
+#!/bin/sh
+
+KEYFILE=/etc/ssh/ssh_host_rsa_key
+PUBKEY=/home/aci/.ssh/authorized_keys
+
+if [ ! -f ${KEYFILE} ]; then
+    ssh-keygen -f ${KEYFILE} -N "" -t rsa;
+fi;
+
+if [ "${SSH_PUBKEY}" ]; then
+    echo ${SSH_PUBKEY} > ${PUBKEY}
+    chmod 600 ${PUBKEY}
+    chown aci ${PUBKEY}
+fi;
+
+exec /usr/sbin/sshd -Dd
