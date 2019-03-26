@@ -12,6 +12,17 @@ check: build # Verify the container
 clean: # Clean up any built resources
 	docker rmi $$(docker images -q -f "reference=$(IMAGE)") || true
 
+run: # Run the container locally, listening on port 2022
+	docker run --rm -ti -p 2022:22 \
+		-e SSH_PUBKEY="$(shell cat ~/.ssh/id_rsa.pub)" \
+		--name aci-tunnel $(IMAGE):$(IMAGE_TAG)
+
+connect: # Connect to a locally running container
+	ssh -p 2022 \
+		-o UserKnownHostsFile=/dev/null \
+		-o StrictHostKeyChecking=no \
+		aci@localhost
+
 # Cute hack thanks to:
 # https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help: ## Display this help text

@@ -1,0 +1,93 @@
+#!/bin/bash
+########w#######################################################################
+# Advanced configuration
+#
+PUBKEY=$HOME/.ssh/id_rsa.pub
+IMAGE=rtyler/aci-tunnel:latest
+#
+########w#######################################################################
+
+
+# Internal variables
+AZ_GROUP=aci
+AZ_CONTAINER=tunnel
+AZ_REGION=westus
+TUNNEL_USER=aci
+TUNNEL_IP=
+
+ports=()
+forwards=()
+
+# Functions for handling starting/stopping
+########w#######################################################################
+shutdown() {
+    echo ">> Attempting to cleanly shut off remote tunnel"
+    az container delete -g ${AZ_GROUP} -n ${AZ_CONTAINER}
+    echo ">> Remote tunnel deleted"
+    exit
+}
+trap shutdown INT TERM
+
+prepare_group() {
+    az group exists -n ${AZ_GROUP} -o json | grep true > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ">> Creating Azure Resource Group '${AZ_GROUP}'"
+        az group create -n ${AZ_GROUP} -l ${AZ_REGION}
+    fi;
+}
+
+startup() {
+    echo ">> Launching tunnel.. "
+    # The pubkey must be encoded in base64 because the az command cannot handle
+    # environment variables with newlines in them
+    az container create -g ${AZ_GROUP} -n ${AZ_CONTAINER} \
+        --image ${IMAGE} \
+        -e BASE64_PUBKEY="$(cat ${PUBKEY} | base64 -w 0)" \
+        --ports 22 ${ports[@]} \
+        --ip-address Public \
+        -o none
+    echo ">> Remote tunnel active"
+}
+
+verify_env() {
+    which az > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ">> This script expects the azure-cli (az) to be installed"
+        exit 1;
+    fi;
+    which base64 > /dev/null
+    if [ $? -ne 0 ]; then
+        echo ">>> This script expects a base64 binary to be present"
+        exit 1;
+    fi;
+}
+########w#######################################################################
+
+########w#######################################################################
+
+verify_env
+
+if [ ! "${1}" ]; then
+    echo ">> Please invoke this script with a space-delimited list of ports to forward"
+    exit 1;
+fi;
+# Prepare some arrays for later usage
+for p in $@; do
+    forwards+=("-R \*:${p}:localhost:${p}")
+    ports+=("${p}")
+done
+
+echo ">> Preparing tunnel.."
+prepare_group
+startup
+
+
+TUNNEL_IP=$(az container show -g ${AZ_GROUP} -n ${AZ_CONTAINER} -o tsv --query 'ipAddress.ip' | sed -e 's/\r//')
+echo ">> Connecting to remote tunnel at ${TUNNEL_IP}"
+ssh -t ${forwards[@]} \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    -l ${TUNNEL_USER} \
+    $TUNNEL_IP "clear;echo 'Tunnel is active! YAY' && nyan"
+
+shutdown

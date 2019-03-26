@@ -7,10 +7,14 @@ if [ ! -f ${KEYFILE} ]; then
     ssh-keygen -f ${KEYFILE} -N "" -t rsa;
 fi;
 
+if [ "${BASE64_PUBKEY}" ]; then
+    export SSH_PUBKEY=$(echo ${BASE64_PUBKEY} | base64 -d)
+fi;
+
 if [ "${SSH_PUBKEY}" ]; then
     echo ${SSH_PUBKEY} > ${PUBKEY}
     chmod 600 ${PUBKEY}
     chown aci ${PUBKEY}
 fi;
 
-exec /usr/sbin/sshd -Dd
+exec /usr/sbin/sshd -D
