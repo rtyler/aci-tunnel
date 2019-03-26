@@ -88,6 +88,6 @@ ssh -t ${forwards[@]} \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
     -l ${TUNNEL_USER} \
-    $TUNNEL_IP "clear;echo 'Tunnel is active! YAY' && nyan"
+    $TUNNEL_IP "clear;echo 'Tunnel is active at ${TUNNEL_IP}! YAY' && nyan"
 
 shutdown

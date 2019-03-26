@@ -7,7 +7,7 @@ EXPOSE 22
 RUN apk add -U -u openssh-server libcurl curl bash ncurses
 
 COPY sshd_config /etc/ssh/
-COPY run-sshd /usr/sbin/
+COPY bin/run-sshd /usr/sbin/
 COPY bin/nyan /usr/bin/
 
 RUN adduser -h /home/aci -D aci && passwd -u aci
