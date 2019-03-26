@@ -27,4 +27,4 @@ printed on the screen!
 
 == Demo
 
-[![asciicast](https://asciinema.org/a/UsIorrs8mPBgq3Zrq49KV1VFn.svg)](https://asciinema.org/a/UsIorrs8mPBgq3Zrq49KV1VFn)
+image:https://asciinema.org/a/UsIorrs8mPBgq3Zrq49KV1VFn.svg[alt="Screencast Demo", link=https://asciinema.org/a/UsIorrs8mPBgq3Zrq49KV1VFn]
