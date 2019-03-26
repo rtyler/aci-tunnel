@@ -1,0 +1,26 @@
+= ACI Tunnel
+
+This repository allows for the creation of public facing tunnels to local
+services through
+link:https://docs.microsoft.com/en-us/azure/container-instances/[Azure
+Container Instances]. This makes it easy to share in-progress development work
+with colleagues across multiple networks and continentns!
+
+
+== Usage
+
+The `aci-tunnel` script expects that the
+link:https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest[Azure CLI]
+is installed and configured for your Azure account.
+
+After that has been set up, simply invoke `aci-tunnel` with the ports you wish to tunnel:
+
+[source,bash]
+----
+aci-tunnel 8080
+----
+
+
+Once the tunnel is active, you would be able to use the public IP address
+printed on the screen!
+

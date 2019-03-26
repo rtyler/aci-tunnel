@@ -22,7 +22,7 @@ forwards=()
 ########w#######################################################################
 shutdown() {
     echo ">> Attempting to cleanly shut off remote tunnel"
-    az container delete -g ${AZ_GROUP} -n ${AZ_CONTAINER}
+    az container delete -g ${AZ_GROUP} -n ${AZ_CONTAINER} -y
     echo ">> Remote tunnel deleted"
     exit
 }
